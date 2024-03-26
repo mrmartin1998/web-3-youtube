@@ -27,17 +27,47 @@ window.onclick = function(event) {
     }
 }
 
+const normalVideos = [
+    'basketball.mp4',
+    'football.mp4',
+    'soccer.mp4'
+];
+
+const adVideos = [
+    'sunblock-ad.mp4'
+];
+
+function getRandomAd() {
+    return adVideos[Math.floor(Math.random() * adVideos.length)];
+}
+
 function loadVideoPlayer(element, videoPath) {
     openModal(videoPath);
 }
 
 function openModal(mainVideoPath) {
     var videoPlayer = document.getElementById("modalVideo");
-    videoPlayer.src = 'path_to_ad.mp4'; // Load ad video first
+    var adPath = getRandomAd();
+    var skipButton = document.getElementById("skipAd");
+    
+    videoPlayer.src = adPath;
+    skipButton.style.display = "none"; // Hide skip button initially
     modal.style.display = "block";
 
     videoPlayer.onended = function() {
-        videoPlayer.src = mainVideoPath; // After ad, load main video
-        videoPlayer.play(); // Play main video
+        skipButton.style.display = "none"; // Hide skip button when ad ends
+        videoPlayer.src = mainVideoPath;
+        videoPlayer.play();
+    };
+
+    setTimeout(function() {
+        skipButton.style.display = "block"; // Show skip button after a delay
+    }, 5000); // 5000 milliseconds = 5 seconds
+
+    skipButton.onclick = function() {
+        videoPlayer.src = mainVideoPath;
+        videoPlayer.play();
+        skipButton.style.display = "none";
     };
 }
+

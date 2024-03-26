@@ -17,11 +17,18 @@
 
     <!-- Page-specific content goes here -->
     <div class="video-grid">
-        <div class="video" onclick="loadVideoPlayer(this, 'path_to_video.mp4')">
+        <!-- Modify the onclick event to use an actual video path -->
+        <div class="video" onclick="loadVideoPlayer(this, normalVideos[0])">
             <img src="https://via.placeholder.com/150" alt="Video Thumbnail">
             <!-- Video details can be added here -->
         </div>
-        <!-- Additional video divs -->
+        <!-- Repeat for other videos -->
+        <div class="video" onclick="loadVideoPlayer(this, normalVideos[1])">
+            <img src="https://via.placeholder.com/150" alt="Video Thumbnail">
+        </div>
+        <div class="video" onclick="loadVideoPlayer(this, normalVideos[2])">
+            <img src="https://via.placeholder.com/150" alt="Video Thumbnail">
+        </div>
     </div>
 
     <div id="videoModal" class="modal">
@@ -31,8 +38,10 @@
                 <source src="" type="video/mp4">
                 Your browser does not support the video tag.
             </video>
+            <button id="skipAd" style="display: none;">Skip Ad</button>
         </div>
     </div>
+    
     
 
     <div id="loading" style="display: none;">Loading...</div>
