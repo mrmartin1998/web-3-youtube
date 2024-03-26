@@ -1,0 +1,18 @@
+{
+  "name": "web-3-youtube",
+  "version": "1.0.0",
+  "description": "## Overview A groundbreaking dApp that revolutionizes video content interaction using blockchain technology. It combines content consumption with decentralized incentives and user engagement.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "truffle": "^5.11.5"
+  },
+  "dependencies": {
+    "web3": "^4.6.0"
+  }
+}
