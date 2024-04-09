@@ -227,56 +227,106 @@ const videoUploadABI = [
   ];
 const videoUploadAddress = '0x26e09b781E631C0C45aeeA314B96827C5123E5c4';
 
-
+let web3;
 let adInteractionContract, rewardsContract, videoUploadContract;
 
 async function initializeWeb3() {
-    if (typeof window.ethereum !== 'undefined') {
-        const web3 = new Web3(Web3.givenProvider || "HTTP://127.0.0.1:7545");;
-        try {
-            await ethereum.request({ method: 'eth_requestAccounts' });
-            console.log('Ethereum enabled');
-            setupContracts(web3);
-        } catch (error) {
-            console.error("User denied account access...");
-        }
-    } else {
-        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-    }
+  if (typeof window.ethereum !== 'undefined') {
+      web3 = new Web3(window.ethereum);
+      try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          console.log('Ethereum enabled');
+          setupContracts();
+      } catch (error) {
+          console.error("User denied account access...");
+      }
+  } else {
+      console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+  }
 }
 
-function setupContracts(web3) {
-    adInteractionContract = new web3.eth.Contract(adInteractionABI, adInteractionAddress);
-    rewardsContract = new web3.eth.Contract(rewardsABI, rewardsAddress);
-    videoUploadContract = new web3.eth.Contract(videoUploadABI, videoUploadAddress);
-    console.log('Contracts are set up and ready to interact with.');
+function setupContracts() {
+  adInteractionContract = new web3.eth.Contract(adInteractionABI, adInteractionAddress);
+  rewardsContract = new web3.eth.Contract(rewardsABI, rewardsAddress);
+  videoUploadContract = new web3.eth.Contract(videoUploadABI, videoUploadAddress);
+  console.log('Contracts are set up and ready to interact with.');
 }
 
 window.addEventListener('load', initializeWeb3);
 
-//upload video function:
-async function uploadVideo(title, hash, description) {
-    const accounts = await web3.eth.getAccounts();
-    await videoUploadContract.methods.uploadVideo(hash, title, description).send({ from: accounts[0] });
+// Assuming IPFS is included via a script tag
+
+
+// Add this script to your app.js or directly in a script tag in your HTML
+
+// This function will be called when the user clicks on the button
+async function connectToMetamask() {
+  if (typeof window.ethereum !== 'undefined') {
+    try {
+      // Request account access
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts'
+      });
+      // Handle the returned accounts
+      console.log('Connected', accounts[0]);
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    console.log('Please install MetaMask!');
+  }
 }
+
+// Event listener for the button
+document.getElementById('connectMetamask').addEventListener('click', connectToMetamask);
+
+const IPFS = require('ipfs-http-client');
+const ipfs = IPFS.create({ host: 'localhost', port: '5001', protocol: 'http' });
+
+async function uploadToIPFS(file) {
+  try {
+    const added = await ipfs.add(file);
+    return added.path;
+  } catch (error) {
+    console.error("Error uploading file to IPFS:", error);
+  }
+}
+
+
+//upload video function:
+async function uploadVideo(title, file) {
+  const hash = await uploadToIPFS(file);
+  if (hash) {
+    const accounts = await web3.eth.getAccounts();
+    await videoUploadContract.methods.uploadVideo(hash, title).send({ from: accounts[0] });
+  }
+}
+
+async function handleUpload() {
+  const fileInput = document.getElementById('videoFile');
+  const file = fileInput.files[0];
+  const title = document.getElementById('videoTitle').value;
+  await uploadVideo(title, file);
+}
+
 
 //watch ad funciton:
 async function watchAd() {
-    const accounts = await web3.eth.getAccounts();
-    await adInteractionContract.methods.watchAd().send({ from: accounts[0] });
+  const accounts = await web3.eth.getAccounts();
+  await adInteractionContract.methods.watchAd().send({ from: accounts[0] });
 }
 
 //Skip Ad Function:
 async function skipAd() {
-    const accounts = await web3.eth.getAccounts();
-    const fee = 1;
-    await adInteractionContract.methods.skipAd().send({ from: accounts[0], value: fee });
+  const accounts = await web3.eth.getAccounts();
+  const fee = web3.utils.toWei('1', 'ether'); // Example fee, adjust as needed
+  await adInteractionContract.methods.skipAd().send({ from: accounts[0], value: fee });
 }
 
 //Claim Reward Function:
 async function claimReward() {
-    const accounts = await web3.eth.getAccounts();
-    await rewardsContract.methods.claimReward().send({ from: accounts[0] });
+  const accounts = await web3.eth.getAccounts();
+  await rewardsContract.methods.claimReward().send({ from: accounts[0] });
 }
 
 

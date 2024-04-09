@@ -13,6 +13,9 @@
     "truffle": "^5.11.5"
   },
   "dependencies": {
+    "@web3-onboard/core": "^2.21.4",
+    "@web3-storage/w3up-client": "^12.5.0",
+    "ipfs-http-client": "^60.0.1",
     "web3": "^4.7.0"
   }
 }
